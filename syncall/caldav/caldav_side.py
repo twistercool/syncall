@@ -75,7 +75,11 @@ class CaldavSide(SyncSide):
 
         # Format & cache items from ics files
         for t in raw_todos:
-            data = icalendar_component(t)
+            try:
+                data = icalendar_component(t)
+            except Exception as E:
+                logger.warning(f"Skipping unparsable calendar object (url={t.url}, {err})")
+                continue
             item = map_ics_to_item(data)
             todos.append(item)
             self._items_cache[item["id"]] = item
@@ -132,7 +136,12 @@ class CaldavSide(SyncSide):
                 set_(key, vText(value.upper()))
             if key in ["due", "created", "last-modified"]:
                 set_(key, vDatetime(value))
-            if key in ["priority", "description", "summary"]:
+            if key == "priority":
+                if value in (None, ""):
+                    icalendar_component(todo).pop("priority", None)
+                else:
+                    set_(key, vText(value))
+            if key in ["description", "summary"]:
                 set_(key, vText(value))
             if key == "categories":
                 set_(key, vCategory([vText(cat) for cat in value]))
