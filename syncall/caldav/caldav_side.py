@@ -77,7 +77,7 @@ class CaldavSide(SyncSide):
         for t in raw_todos:
             try:
                 data = icalendar_component(t)
-            except Exception as E:
+            except Exception as err:
                 logger.warning(f"Skipping unparsable calendar object (url={t.url}, {err})")
                 continue
             item = map_ics_to_item(data)
