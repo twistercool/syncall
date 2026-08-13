@@ -147,7 +147,7 @@ class CaldavSide(SyncSide):
         for key in self._identical_comparison_keys:
             icalendar_component(todo).pop(key)
 
-        self._update_todo_changes(todo, changes)
+        self._update_todo_changes(todo, **changes)
 
         todo.save()
 
